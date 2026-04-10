@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}作品集 - 个人网站{% endblock %}
+
+{% block content %}
+<section class="portfolio-section">
+    <div class="container">
+        <h1>我的作品</h1>
+        <p class="subtitle">展示我在数据分析、GIS 和 Python 开发方面的经验和成果</p>
+
+        <div class="projects-grid">
+            {% if projects %}
+                {% for project in projects %}
+                <div class="project-card">
+                    <div class="project-image">
+                        {% if project.image_url %}
+                        <img src="{{ project.image_url }}" alt="{{ project.title }}">
+                        {% else %}
+                        <div class="placeholder-image"></div>
+                        {% endif %}
+                    </div>
+                    <div class="project-info">
+                        <h3>{{ project.title }}</h3>
+                        <p>{{ project.description[:150] }}...</p>
+                        <div class="tech-tags">
+                            {% for tech in project.get_technologies() %}
+                            <span class="tag">{{ tech }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="project-links">
+                            {% if project.project_url %}
+                            <a href="{{ project.project_url }}" target="_blank" class="btn-link">查看项目</a>
+                            {% endif %}
+                            {% if project.github_url %}
+                            <a href="{{ project.github_url }}" target="_blank" class="btn-link">GitHub</a>
+                            {% endif %}
+                            <a href="{{ url_for('portfolio.project_detail', project_id=project.id) }}" class="btn-link">详情</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <p class="empty-message">暂无作品，敬请期待...</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

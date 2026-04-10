@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}关于我 - 个人网站{% endblock %}
+
+{% block content %}
+<section class="about-section">
+    <div class="container">
+        <div class="about-header">
+            <h1>关于我</h1>
+            <p class="intro">数据驱动的专业人士，具有强大的分析能力和编程技能</p>
+        </div>
+
+        <!-- 个人简介 -->
+        <div class="about-intro">
+            <div class="about-text">
+                <h2>我是谁？</h2>
+                <p>
+                    我是 Luqi Dong（董陆琪），一位见解深远的数据科学家和 LLM 工程师，拥有运输系统博士学位，
+                    专攻生成式 AI 架构、行为建模和大规模时空数据科学。
+                </p>
+                <p>
+                    我在运输领域拥有 7+ 年的经验，擅长通过预测建模、机器学习应用和高级地理空间分析将复杂数据转化为可操作的洞察。
+                    目前在 Accenture NL 开发企业级 AI 和 NLP 解决方案，利用我在微调 LLM、检索增强生成 (RAG) 和自然语言处理方面的专业知识。
+                </p>
+                <p>
+                    我以善于协作、可靠、对数据可视化敏锐、问题解决能力强和思周密的沟通风格而闻名。
+                    我致力于使用最新的数据科学和 AI 技术来解决实际问题，并为所有项目带来专业和创新的方法。
+                </p>
+            </div>
+            <div class="about-image">
+                <div class="placeholder-image-large"></div>
+            </div>
+        </div>
+
+        <!-- 工作经验 -->
+        {% if experiences %}
+        <section class="experience-section">
+            <h2>工作经验</h2>
+            <div class="timeline">
+                {% for exp in experiences %}
+                <div class="timeline-item">
+                    <div class="timeline-date">{{ exp.start_date }} - {% if exp.current %}至今{% else %}{{ exp.end_date }}{% endif %}</div>
+                    <div class="timeline-content">
+                        <h3>{{ exp.position }}</h3>
+                        <p class="company">{{ exp.company }}</p>
+                        {% if exp.description %}
+                        <p>{{ exp.description }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- 技能 -->
+        {% if skills %}
+        <section class="skills-section">
+            <h2>技能</h2>
+            <div class="skills-grid">
+                {% set current_category = '' %}
+                {% for skill in skills|groupby('category') %}
+                <div class="skill-category">
+                    <h3>{{ skill.grouper }}</h3>
+                    <div class="skill-list">
+                        {% for s in skill.list %}
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span class="skill-name">{{ s.name }}</span>
+                                {% if s.proficiency %}
+                                <span class="proficiency">{{ s.proficiency }}/5</span>
+                                {% endif %}
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: {{ (s.proficiency or 0) * 20 }}%"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- 教育经历 (可选) -->
+        <section class="education-section">
+            <h2>教育背景</h2>
+            <div class="education-item">
+                <h3>博士学位 - 运输工程与管理</h3>
+                <p><strong>荷兰特温特大学</strong>（University of Twente） | Enschede, Netherlands<br>
+                   <em>2021 年 10 月 - 现在（预期 2026 年）</em><br>
+                   研究领域：移动性研究、生成式 AI、大规模时空数据科学</p>
+            </div>
+            <div class="education-item">
+                <h3>硕士学位 - 运输规划</h3>
+                <p><strong>北京交通大学</strong>（Beijing Jiaotong University） | Beijing, China<br>
+                   <em>2018 年 9 月 - 2021 年 6 月</em><br>
+                   论文：基于 GPS 轨迹的城市可达性时空模型分析</p>
+            </div>
+        </section>
+    </div>
+</section>
+{% endblock %}

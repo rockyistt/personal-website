@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}简历 - 个人网站{% endblock %}
+
+{% block content %}
+<section class="resume-section">
+    <div class="container">
+        <div class="resume-header">
+            <h1>简历</h1>
+            <a href="#" class="btn btn-primary">下载 PDF</a>
+        </div>
+
+        <div class="resume-content">
+            <!-- 个人信息 -->
+            <section class="resume-section-item">
+                <h2>个人信息</h2>
+                <ul>
+                    <li><strong>姓名：</strong> Luqi Dong (董陆琪)</li>
+                    <li><strong>职位：</strong> AI Solutions Engineer & Data Scientist | PhD Transport Systems</li>
+                    <li><strong>邮箱：</strong> l.rockydong@outlook.com</li>
+                    <li><strong>电话：</strong> +31-616667957</li>
+                    <li><strong>位置：</strong> Enschede, Netherlands</li>
+                    <li><strong>语言：</strong> 中文（母语）| 英文（流利）| 荷兰语（初级）</li>
+                </ul>
+            </section>
+
+            <!-- 专业摘要 -->
+            <section class="resume-section-item">
+                <h2>专业摘要</h2>
+                <p>
+                    见解深远的数据科学家和 LLM 工程师，拥有运输系统博士学位，
+                    专攻生成式 AI 架构、行为建模和大规模时空数据科学。
+                    在运输领域拥有 7+ 年的经验，能够通过预测建模、机器学习应用和高级地理空间分析将复杂数据转化为可操作的洞察。
+                    目前在 Accenture NL 开发企业级 AI 和 NLP 解决方案。
+                </p>
+            </section>
+
+            <!-- 工作经验 -->
+            {% if experiences %}
+            <section class="resume-section-item">
+                <h2>工作经验</h2>
+                {% for exp in experiences %}
+                <div class="resume-item">
+                    <div class="resume-item-header">
+                        <h3>{{ exp.position }}</h3>
+                        <span class="date">{{ exp.start_date }} - {% if exp.current %}至今{% else %}{{ exp.end_date }}{% endif %}</span>
+                    </div>
+                    <p class="company">{{ exp.company }}</p>
+                    {% if exp.description %}
+                    <p>{{ exp.description }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </section>
+            {% endif %}
+
+            <!-- 技能 -->
+            {% if skills %}
+            <section class="resume-section-item">
+                <h2>核心技能</h2>
+                <div class="skills-list">
+                    {% set current_category = '' %}
+                    {% for skill in skills|groupby('category') %}
+                    <div class="skill-category-resume">
+                        <strong>{{ skill.grouper }}：</strong>
+                        <span>
+                            {% for s in skill.list %}
+                                {{ s.name }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- 教育 -->
+            <section class="resume-section-item">
+                <h2>教育背景</h2>
+                <div class="resume-item">
+                    <div class="resume-item-header">
+                        <h3>Ph.D. 运输工程与管理</h3>
+                        <span class="date">2021.10 - 现在（预期 2026）</span>
+                    </div>
+                    <p><strong>荷兰特温特大学</strong>（University of Twente）| Enschede, Netherlands</p>
+                    <p><em>研究方向：移动性研究、生成式 AI、大规模时空数据科学</em></p>
+                </div>
+                <div class="resume-item">
+                    <div class="resume-item-header">
+                        <h3>硕士学位 - 运输规划</h3>
+                        <span class="date">2018.09 - 2021.06</span>
+                    </div>
+                    <p><strong>北京交通大学</strong>（Beijing Jiaotong University）| Beijing, China</p>
+                    <p><em>论文：基于 GPS 轨迹的城市可达性时空模型分析</em></p>
+                </div>
+            </section>
+
+            <!-- 证书 奖项与认证</h2>
+                <ul>
+                    <li><strong>中国研究生数学建模竞赛二等奖</strong> - 第 16 届 (2019 年 12 月) | 排名前 14.5%</li>
+                    <li><strong>优秀毕业生</strong> - 北京交通大学 (2018 年 6 月)</li>
+                    <li><strong>综合一等奖学金</strong> - 重庆大学 (2018 年 3 月) | 排名 2/800
+                    <li>证书名称 - 颁发机构 (年份)</li>
+                    <li>证书名称 - 颁发机构 (年份)</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}
