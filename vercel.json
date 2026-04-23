@@ -3,7 +3,10 @@
   "builds": [
     {
       "src": "wsgi.py",
-      "use": "@vercel/python@^2"
+      "use": "@vercel/python@^2",
+      "config": {
+        "pythonVersion": "3.11"
+      }
     }
   ],
   "routes": [
@@ -11,5 +14,8 @@
       "src": "/(.*)",
       "dest": "wsgi.py"
     }
-  ]
+  ],
+  "env": {
+    "PYTHONUNBUFFERED": "1"
+  }
 }
