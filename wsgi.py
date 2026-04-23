@@ -629,6 +629,7 @@ BASE_STYLE = """
 
 # ===== 首页模板 =====
 HOME_TEMPLATE = f"""
+<!-- VERSION -->
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -789,7 +790,8 @@ PROJECT_TEMPLATE = f"""
 # ===== Flask路由 =====
 @app.route("/")
 def home():
-    return HOME_TEMPLATE
+    # Version marker - force Vercel to recognize new deployment
+    return HOME_TEMPLATE.replace("<!-- VERSION -->", "<!-- Version 3.0: Multi-page with projects -->")
 
 @app.route("/project/<int:project_id>")
 def project_detail(project_id):
