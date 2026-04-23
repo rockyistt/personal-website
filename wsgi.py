@@ -640,6 +640,10 @@ HOME_TEMPLATE = f"""
 </head>
 <body>
 <div class="wrapper">
+    <div style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; font-weight: bold; text-align: center; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);">
+        ✨ NEW WEBSITE V3.0 - Projects Now Visible! 🚀
+    </div>
+    
     <nav>
         <a href="/" class="logo">👨‍💻 Luqi</a>
         <ul class="nav-links">
