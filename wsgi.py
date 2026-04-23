@@ -1,16 +1,24 @@
 import os
+import sys
+import traceback
 from app import create_app, db
 from app.models import Project, Experience, Skill
 
-# 创建 Flask 应用
-app = create_app()
+try:
+    # 创建 Flask 应用
+    app = create_app()
 
-# 初始化生产环境数据库
-with app.app_context():
-    db.create_all()
-    
-    # 如果数据库为空，添加示例数据
-    if Project.query.first() is None:
+    # 初始化生产环境数据库
+    with app.app_context():
+        try:
+            db.create_all()
+        except Exception as e:
+            print(f"Database creation error: {e}")
+            traceback.print_exc()
+        
+        # 如果数据库为空，添加示例数据
+        try:
+            if Project.query.first() is None:
         # ===== 添加真实项目 =====
         project1 = Project(
             title='AI/LLM 在 GIS 测试自动化中的应用',
@@ -129,6 +137,21 @@ with app.app_context():
         ] + ai_skills + ds_skills + gis_skills + prog_skills + viz_skills + stat_skills)
         
         db.session.commit()
+        except Exception as e:
+            print(f"Data seeding error: {e}")
+            traceback.print_exc()
+            db.session.rollback()
+
+except Exception as e:
+    print(f"Application initialization error: {e}")
+    traceback.print_exc()
+    # 创建一个最小的应用以避免完全崩溃
+    from flask import Flask
+    app = Flask(__name__)
+    
+    @app.route('/')
+    def error_page():
+        return f"<h1>Application Error</h1><p>{str(e)}</p><pre>{traceback.format_exc()}</pre>", 500
 
 if __name__ == '__main__':
     app.run(debug=False)
