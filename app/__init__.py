@@ -1,156 +1,66 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
-import tempfile
-import sys
 
 db = SQLAlchemy()
 
 def create_app():
-    try:
-        app = Flask(__name__)
-        
-        # 配置 - 检测是否在 Vercel 环境
-        if os.environ.get('VERCEL'):
-            # Vercel 环境：使用 /tmp 目录
-            db_path = os.path.join(tempfile.gettempdir(), 'app.db')
-            app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
-        else:
-            # 本地开发环境
-            basedir = os.path.abspath(os.path.dirname(__file__))
-            db_path = os.path.join(basedir, '../instance/app.db')
-            app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
-        
-        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-        app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
-        
-        # 初始化数据库
-        db.init_app(app)
-        
-        # 创建数据库表并初始化数据
-        with app.app_context():
-            try:
-                db.create_all()
-                init_db()
-            except Exception as e:
-                print(f"Warning: Database initialization failed: {e}", file=sys.stderr)
-                # 继续启动应用，即使初始化失败
-        
-        # 注册路由
-        try:
-            from app.routes import main_bp, portfolio_bp
-            app.register_blueprint(main_bp)
-            app.register_blueprint(portfolio_bp)
-        except Exception as e:
-            print(f"Warning: Failed to register blueprints: {e}", file=sys.stderr)
-            # 创建一个基本的路由以便调试
-            @app.route('/')
-            def health_check():
-                return f"App running with error: {str(e)}"
-        
-        return app
+    app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), 'templates'))
     
-    except Exception as e:
-        print(f"Critical error in app creation: {e}", file=sys.stderr)
-        import traceback
-        traceback.print_exc()
-        # 返回最小化的应用以避免完全崩溃
-        app = Flask(__name__)
-        db.init_app(app)
-        
-        @app.route('/')
-        def error():
-            return f"<h1>Application Initialization Error</h1><p>{str(e)}</p>", 500
-        
-        return app
+    # 简单配置
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SECRET_KEY'] = 'dev-key'
+    
+    db.init_app(app)
+    
+    # 注册一个简单的测试路由
+    @app.route('/')
+    def home():
+        return '''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Luqi Dong - Personal Website</title>
+            <style>
+                body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }
+                h1 { color: #333; }
+                .intro { background: #f5f5f5; padding: 20px; border-radius: 8px; }
+                .section { margin: 30px 0; }
+            </style>
+        </head>
+        <body>
+            <h1>👋 Luqi Dong</h1>
+            <p>AI Solutions Engineer & Data Scientist</p>
+            
+            <div class="intro">
+                <h2>About Me</h2>
+                <p>Welcome to my personal website! I'm a data scientist and AI engineer with expertise in:</p>
+                <ul>
+                    <li>Large Language Models (LLMs) and RAG</li>
+                    <li>GIS and Spatial Analysis</li>
+                    <li>Machine Learning and Data Science</li>
+                    <li>Transport Modelling and Behavioral Analysis</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2>Experience</h2>
+                <p><strong>Accenture NL</strong> - Data & NLP Engineer (2025-2026)</p>
+                <p><strong>University of Twente</strong> - PhD Researcher (2021-Present)</p>
+                <p><strong>Beijing Jiaotong University</strong> - Master's (2018-2021)</p>
+            </div>
+            
+            <div class="section">
+                <p><a href="https://github.com/rockyistt">GitHub</a> | 
+                   <a href="https://linkedin.com">LinkedIn</a></p>
+            </div>
+        </body>
+        </html>
+        '''
+    
+    return app
 
-def init_db():
-    """初始化数据库种子数据"""
-    try:
-        from app.models import Project, Experience, Skill
-        
-        # 如果项目表已有数据，则跳过
-        if Project.query.first() is not None:
-            return
-        
-        projects = [
-            Project(
-                title='AI/LLM 在 GIS 测试自动化中的应用',
-                description='在 Accenture NL 开发企业级 AI 和 NLP 解决方案。设计两阶段模块化框架，使用 CodeLlama-7B 与 LoRA 技术实现从需求到原子步骤的映射。',
-                technologies='Python, PyTorch, Hugging Face, CodeLlama, LoRA, PEFT, RAG, LangChain, ArcGIS',
-                featured=True
-            ),
-            Project(
-                title='共享微出行用户行为建模研究',
-                description='PhD 研究项目：对共享微出行服务用户行为进行综合研究。设计可扩展数据收集框架，应用隐性类模型发现用户细分，构建预测模型。',
-                technologies='Python, R, SQL, ArcGIS, Power BI, GeoPandas, Scikit-learn, Statistical Modeling',
-                featured=True
-            ),
-            Project(
-                title='基于 GPS 轨迹的城市可达性时空模型',
-                description='Master 论文项目：分析 136GB GPS 轨迹数据建立城市可达性模型。提取出行时间，应用聚类算法，构建空间可达性模型。',
-                technologies='Python, Pandas, GeoPandas, ArcGIS, SQL, Gaode Map API, Clustering algorithms',
-                featured=True
-            ),
-            Project(
-                title='城市交通可达性分析',
-                description='医疗设施可达性分析案例研究。在公共卫生紧急情况下分析交通网络城市可达性的时空特征。',
-                technologies='Python, ArcGIS, Network Analysis, Spatial Statistics',
-                featured=False
-            ),
-            Project(
-                title='个人网站项目',
-                description='使用现代 Flask 框架构建的专业个人网站。展示简历、作品集、技能和研究成果。包含响应式设计、数据库集成和 API 端点。',
-                technologies='Flask, SQLAlchemy, Python, HTML5, CSS3, JavaScript, Jinja2',
-                featured=True,
-                github_url='https://github.com/rockyistt/personal-website'
-            )
-        ]
-        
-        experiences = [
-            Experience(
-                company='Accenture NL - Industry X',
-                position='Data & NLP Intern / AI/LLM Engineer',
-                start_date='2025-11',
-                end_date='2026-03',
-                description='开发企业级 AI 和 NLP 解决方案，专注于 GIS 测试自动化。',
-                current=True
-            ),
-            Experience(
-                company='University of Twente',
-                position='PhD Researcher',
-                start_date='2021-10',
-                end_date=None,
-                description='进行共享微出行研究。',
-                current=True
-            ),
-            Experience(
-                company='Beijing Jiaotong University',
-                position='Master Student',
-                start_date='2018-09',
-                end_date='2021-06',
-                description='完成Master论文。',
-                current=False
-            )
-        ]
-        
-        skills_data = [
-            ('AI & Generative AI', 'Large Language Models', 5),
-            ('AI & Generative AI', 'RAG', 5),
-            ('Data Science', 'Machine Learning', 5),
-            ('GIS & Spatial Analysis', 'ArcGIS', 5),
-            ('Programming & Databases', 'Python', 5),
-        ]
-        
-        skills = [Skill(category=cat, name=name, proficiency=prof) for cat, name, prof in skills_data]
-        
-        db.session.add_all(projects + experiences + skills)
-        db.session.commit()
-        print("✅ Database initialized successfully")
-        
-    except Exception as e:
-        print(f"⚠️ Error initializing database: {e}", file=sys.stderr)
-        db.session.rollback()
         projects = [
             Project(
                 title='AI/LLM 在 GIS 测试自动化中的应用',
